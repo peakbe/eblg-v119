@@ -1,5 +1,41 @@
 import { SONOMETERS } from "./config.js";
 
+let heatLayer = null;
+
+export function createStaticHeatmap(map) {
+    // Chaque sonomètre = intensité 1 (uniforme)
+    const heatPoints = SONOMETERS.map(s => [s.lat, s.lon, 1]);
+
+    heatLayer = L.heatLayer(heatPoints, {
+        radius: 35,
+        blur: 20,
+        maxZoom: 12,
+        minOpacity: 0.4,
+        gradient: {
+            0.2: "#00bcd4",
+            0.4: "#4caf50",
+            0.6: "#ffeb3b",
+            0.8: "#ff9800",
+            1.0: "#f44336"
+        }
+    });
+
+    return heatLayer;
+}
+
+export function toggleHeatmap(map) {
+    if (!heatLayer) {
+        createStaticHeatmap(map);
+    }
+
+    if (map.hasLayer(heatLayer)) {
+        map.removeLayer(heatLayer);
+    } else {
+        heatLayer.addTo(map);
+    }
+}
+
+
 const sonoList = document.getElementById("sono-list");
 const detailPanel = document.getElementById("detail-panel");
 const detailTitle = document.getElementById("detail-title");
