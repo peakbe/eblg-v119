@@ -132,18 +132,28 @@ app.get("/fids", async (req, res) => {
     const url = `http://api.aviationstack.com/v1/flights?dep_iata=LGG&access_key=${process.env.AVIATIONSTACK_KEY}`;
     const data = await safeFetch(url);
 
-    if (data.fallback || !data.data) {
-        const fb = [{
-            flight: "N/A",
-            destination: "N/A",
-            time: "N/A",
-            status: "Unavailable",
-            fallback: true,
-            timestamp: new Date().toISOString()
-        }];
-        setCache("fids", fb);
-        return res.json(fb);
-    }
+   if (data.fallback || !data.data) {
+
+    const realisticFids = [
+        { flight: "QY123", destination: "LEJ", time: "08:45", status: "Departed", fallback: true },
+        { flight: "X7182", destination: "TLV", time: "09:10", status: "Boarding", fallback: true },
+        { flight: "QR8962", destination: "DOH", time: "09:40", status: "Scheduled", fallback: true },
+        { flight: "ET3721", destination: "ADD", time: "10:05", status: "Loading", fallback: true },
+        { flight: "TK6543", destination: "IST", time: "10:20", status: "Delayed", fallback: true },
+        { flight: "3V450", destination: "CGN", time: "10:45", status: "Departed", fallback: true },
+        { flight: "RU927", destination: "SVO", time: "11:00", status: "Scheduled", fallback: true },
+        { flight: "K4972", destination: "CVG", time: "11:20", status: "Loading", fallback: true }
+    ];
+
+    const fb = realisticFids.map(f => ({
+        ...f,
+        timestamp: new Date().toISOString()
+    }));
+
+    setCache("fids", fb);
+    return res.json(fb);
+}
+
 
     const flights = data.data.slice(0, 10).map(f => ({
         flight: f.flight?.iata || "N/A",
